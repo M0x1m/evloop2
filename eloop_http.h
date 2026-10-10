@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <setjmp.h>
+#include <assert.h>
 
 #ifndef ELOOPHTTPDEF
 #define ELOOPHTTPDEF
