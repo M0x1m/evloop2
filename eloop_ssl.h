@@ -121,14 +121,13 @@ ELOOPSSLDEF void essl_ctx_set_verify(essl_ctx_t ctx, int mode, int (*cb)(int, X5
 static int essl__io_yield(int ret, essl_t *ssl)
 {
     switch (SSL_get_error(ssl->ssl, ret)) {
-    case SSL_ERROR_WANT_READ:  return essl_wait(ssl, EV_F_READ); break;
-    case SSL_ERROR_WANT_WRITE: return essl_wait(ssl, EV_F_WRITE); break;
+    case SSL_ERROR_WANT_READ:  return essl_wait(ssl, EV_F_READ);
+    case SSL_ERROR_WANT_WRITE: return essl_wait(ssl, EV_F_WRITE);
     default:
         ssl->error = ESSL_ERR_IO;
         if (ssl->cbs.onerror) ssl->cbs.onerror(ssl);
         return -1;
     }
-    assert(0 && "unreachable");
 }
 
 static int essl__new_ssl(essl_ctx_t ctx, essl_t *ssl, enet_socket *sock)
