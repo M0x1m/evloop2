@@ -47,8 +47,9 @@ typedef struct {
 
 typedef void (*enet_routine)(enet_socket *);
 
-ELOOPNETDEF void enet_connect_tcp(event_loop *, const char *, int, enet_routine, void *);
-ELOOPNETDEF void enet_connect_udp(event_loop *, const char *, int, enet_routine, void *);
+ELOOPNETDEF ev_task *enet_connect_tcp(event_loop *, const char *, int, enet_routine, void *);
+ELOOPNETDEF ev_task *enet_connect_udp(event_loop *, const char *, int, enet_routine, void *);
+/* TODO: bind interface should return ev_task too */
 ELOOPNETDEF int enet_bind_tcp(event_loop *, int, enet_routine acceptor, void *);
 ELOOPNETDEF int enet_bind_udp(event_loop *, int, enet_routine acceptor, void *);
 
@@ -65,7 +66,7 @@ struct enet_bind_ex_opts {
     const char *host;
 };
 
-ELOOPNETDEF void enet_connect_ex(event_loop *, const char *, int, enet_routine acceptor, void *, struct enet_connect_ex_opts);
+ELOOPNETDEF ev_task *enet_connect_ex(event_loop *, const char *, int, enet_routine acceptor, void *, struct enet_connect_ex_opts);
 ELOOPNETDEF int enet_bind_ex(event_loop *, int, enet_routine acceptor, void *, struct enet_bind_ex_opts);
 
 ELOOPNETDEF int esock_accept(enet_socket *, enet_routine, void *);
@@ -273,7 +274,7 @@ static void enet__connect_task(void)
     routine(&sock);
 }
 
-static void enet__connect(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata, struct enet_connect_ex_opts opts)
+static ev_task *enet__connect(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata, struct enet_connect_ex_opts opts)
 {
     struct enet__connect_task_closure *c;
     ev_task *task;
@@ -289,29 +290,30 @@ static void enet__connect(event_loop *ev, const char *host, int port, enet_routi
     c->host    = host;
     c->routine = routine;
     c->userdata = userdata;
+    return task;
 }
 
-ELOOPNETDEF void enet_connect_tcp(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata)
+ELOOPNETDEF ev_task *enet_connect_tcp(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata)
 {
     struct enet_connect_ex_opts opts;
     opts.socktype = ENET_SOCK_TCP;
     opts.flags    = ENET_EX_F_NONE;
     opts.timeout  = -1;
-    enet__connect(ev, host, port, routine, userdata, opts);
+    return enet__connect(ev, host, port, routine, userdata, opts);
 }
 
-ELOOPNETDEF void enet_connect_udp(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata)
+ELOOPNETDEF ev_task *enet_connect_udp(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata)
 {
     struct enet_connect_ex_opts opts;
     opts.socktype = ENET_SOCK_UDP;
     opts.flags    = ENET_EX_F_NONE;
     opts.timeout  = -1;
-    enet__connect(ev, host, port, routine, userdata, opts);
+    return enet__connect(ev, host, port, routine, userdata, opts);
 }
 
-ELOOPNETDEF void enet_connect_ex(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata, struct enet_connect_ex_opts opts)
+ELOOPNETDEF ev_task *enet_connect_ex(event_loop *ev, const char *host, int port, enet_routine routine, void *userdata, struct enet_connect_ex_opts opts)
 {
-    enet__connect(ev, host, port, routine, userdata, opts);
+    return enet__connect(ev, host, port, routine, userdata, opts);
 }
 
 static int enet__bind_sock(struct enet_bind_ex_opts opts, int port, int *out_fd)
