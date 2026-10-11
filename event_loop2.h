@@ -470,8 +470,8 @@ static void eloop__match_randezvous(event_loop *ev)
         sender->wait_flags &= ~EV_F_SEND_MESSAGE;
         receiver->wait_flags &= ~EV_F_RECV_MESSAGE;
 
-        sender->wake_flags = EV_F_SEND_MESSAGE;
-        receiver->wake_flags = EV_F_RECV_MESSAGE;
+        sender->wake_flags |= EV_F_SEND_MESSAGE;
+        receiver->wake_flags |= EV_F_RECV_MESSAGE;
     }
 }
 
