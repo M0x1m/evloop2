@@ -40,7 +40,7 @@ enum {
     EV_F_SEND_MESSAGE = 0x10,
     EV_F_ERROR        = 0x20,
     EV_F_NOTIFY       = 0x40,
-    EV_F_DISTURBTIONS = EV_F_RECV_MESSAGE | EV_F_SEND_MESSAGE,
+    EV_F_DISTURBANCES = EV_F_RECV_MESSAGE | EV_F_SEND_MESSAGE,
     EV_F_EXCEPTIONS   = EV_F_ERROR | EV_F_TIMEOUT
 };
 
@@ -436,7 +436,7 @@ static void eloop__dispatch(event_loop *ev)
     while (task) {
         ev_task *next = task->next;
         assert(!(task->flags & EV_TASK_F_INIT) && "ev_run_init() should be called right after creating of the task");
-        if (task->wake_flags & (task->wait_flags | EV_F_EXCEPTIONS | EV_F_DISTURBTIONS)) {
+        if (task->wake_flags & (task->wait_flags | EV_F_EXCEPTIONS | EV_F_DISTURBANCES)) {
             co_switch(task->env);
             task->wake_flags = 0;
         }
@@ -464,13 +464,13 @@ static void eloop__match_randezvous(event_loop *ev)
 
         ev->flags |= ELOOP_F_DISTURB_MESSAGE;
 
-        receiver->message.data = sender->message.data;
+        receiver->message.data    = sender->message.data;
         receiver->message.partner = sender;
 
-        sender->wait_flags &= ~EV_F_SEND_MESSAGE;
+        sender->wait_flags   &= ~EV_F_SEND_MESSAGE;
         receiver->wait_flags &= ~EV_F_RECV_MESSAGE;
 
-        sender->wake_flags |= EV_F_SEND_MESSAGE;
+        sender->wake_flags   |= EV_F_SEND_MESSAGE;
         receiver->wake_flags |= EV_F_RECV_MESSAGE;
     }
 }
