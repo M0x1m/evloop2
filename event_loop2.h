@@ -704,6 +704,7 @@ EVENTLOOP2DEF void ev_run_init(ev_task *task)
 
 EVENTLOOP2DEF int ev_get_task_timeout(ev_task *task)
 {
+    if (!task) task = ev_current();
     return task->timeout;
 }
 
