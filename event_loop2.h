@@ -318,7 +318,7 @@ static void eloop__cancel_randevouz_if_dead(ev_task *task)
     if (!partner) return;
     if (!EV_IS_DEAD(partner)) return;
     task->message.partner = NULL;
-    task->wake_flags = EV_F_ERROR;
+    task->wake_flags |= EV_F_ERROR;
 }
 
 static void eloop__cleanup(event_loop *ev)
