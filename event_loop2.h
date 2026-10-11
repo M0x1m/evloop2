@@ -588,7 +588,7 @@ EVENTLOOP2DEF int ev_send_message(ev_task *dst, void *msg)
     while (sender->wait_flags & EV_F_SEND_MESSAGE) {
         int flags = ev_yield();
         if (flags & EV_F_SEND_MESSAGE) break;
-        if (flags & (EV_F_TIMEOUT|EV_F_ERROR)) {
+        if (flags & EV_F_EXCEPTIONS) {
             sender->wait_flags = old_flags;
             sender->message.partner = NULL;
             return -1;
@@ -609,7 +609,7 @@ EVENTLOOP2DEF void *ev_recv_message(void)
     while (receiver->wait_flags & EV_F_RECV_MESSAGE) {
         int flags = ev_yield();
         if (flags & EV_F_RECV_MESSAGE) break;
-        if (flags & (EV_F_TIMEOUT|EV_F_ERROR)) {
+        if (flags & EV_F_EXCEPTIONS) {
             receiver->wait_flags = old_flags;
             return NULL;
         }
