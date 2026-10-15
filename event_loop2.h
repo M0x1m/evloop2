@@ -595,6 +595,8 @@ EVENTLOOP2DEF int ev_send_message(ev_task *dst, void *msg)
         }
     }
 
+    sender->message.data = NULL;
+    sender->message.partner = NULL;
     sender->wait_flags = old_flags;
     return 0;
 }
